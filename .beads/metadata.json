@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "bd_2026_spring_AI_Development",
+  "project_id": "ec9bb5bc-65a0-4beb-8680-21cb4bcb499c"
+}

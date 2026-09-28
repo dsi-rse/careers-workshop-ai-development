@@ -1,0 +1,14 @@
+[project]
+name = "ai-development-course"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.32.0",
+  "jinja2>=3.1.0",
+  "httpx>=0.27.0",
+  "pandas>=2.0.0",
+  "numpy>=1.24.0",
+  "pydantic>=2.0.0",
+  "matplotlib>=3.7.0",
+]

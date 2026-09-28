@@ -1,0 +1,601 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usecolortheme{default}
+% --- Organization slides (TOC + section dividers) ---
+\AtBeginSection[]
+{
+  \begin{frame}{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\title{Lecture 3: Improving Performance}
+\subtitle{From a Working Prototype to Reliable Results}
+\author{University of Chicago}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\section{Where We Are}
+
+\begin{frame}{Review: What We've Covered}
+\textbf{Lecture 1: Foundations}
+\begin{itemize}
+    \item Basic AI terminology (LLMs, tokens, context windows, APIs)
+    \item How to work with these models programmatically
+    \item Understanding pricing and token economics
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Lecture 2: Building AI Systems}
+\begin{itemize}
+    \item Vertical slices -- prove end-to-end flow works first
+    \item Crawl, Walk, Run -- start simple, add complexity incrementally
+    \item Built a resume scorer: resume + job req $\rightarrow$ 0--100 score
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Where We're Going}
+\textbf{Last time}: We built a working resume scorer
+\begin{itemize}
+    \item Single prompt, single call, returns a score
+    \item It works! But how \textit{well} does it work?
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Today}: Techniques to improve AI system performance
+\begin{itemize}
+    \item Walk through common failure modes
+    \item Learn a toolkit of solutions
+    \item Apply them to the resume scorer in the notebook
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Framework}: Problem $\rightarrow$ Why it happens $\rightarrow$ Solution
+\end{frame}
+
+\section{The Single-Shot Baseline}
+
+\begin{frame}{Our Starting Point}
+\textbf{The resume scorer from Lecture 2}:
+\vspace{0.3cm}
+
+\begin{center}
+\fbox{Resume Text} + \fbox{Job Requirements}
+$\;\longrightarrow\;$
+\fbox{LLM: ``Score 0--100''}
+$\;\longrightarrow\;$
+\fbox{Score: 72}
+\end{center}
+\vspace{0.3cm}
+
+\textbf{This is a vertical slice} -- it works end-to-end.\\
+Now: how do we make it \textit{good}?
+\end{frame}
+
+\begin{frame}{What Does ``Good'' Look Like?}
+\vspace{0.3cm}
+
+\begin{itemize}
+\item What are some characteristics of good? 
+\item (Open Question)
+\end{itemize}
+\vspace{0.3cm}
+
+\end{frame}
+
+\begin{frame}{What Does ``Good'' Look Like?}
+\vspace{0.3cm}
+
+\begin{itemize}
+\item \textbf{Accurate} -- scores reflect actual candidate quality
+\item \textbf{Consistent} -- same resume gets the same score every time
+\item \textbf{Differentiated} -- strong candidates score higher than weak ones
+\item \textbf{Explainable} -- you can justify why a candidate got their score
+\end{itemize}
+\vspace{0.3cm}
+
+\end{frame}
+
+\begin{frame}{Model Iteration}
+\textbf{Best practice}: Create a measurable result, then iterate
+\vspace{0.3cm}
+
+\begin{enumerate}
+\item \textbf{Label some data} -- identify resumes where you know the answer
+\item \textbf{Run your prompt} -- see how the model performs
+\item \textbf{Identify failures} -- where does it get things wrong?
+\item \textbf{Adjust and re-run} -- change the prompt, check if results improve
+\end{enumerate}
+\vspace{0.3cm}
+
+\textbf{This is the loop we'll follow today}: identify a problem, apply a fix, measure improvement.
+\end{frame}
+
+\section{Common Problems and Solutions}
+
+\section{Problem 1: Score Averaging}
+
+\begin{frame}{Problem: Everything Gets a Similar Score}
+
+\textbf{You run the scorer on 6 resumes and get}:
+\vspace{0.3cm}
+
+\begin{center}
+\begin{tabular}{l c}
+\textbf{Resume} & \textbf{Score} \\
+\hline
+Resume A & 74 \\
+Resume B & 71 \\
+Resume C & 68 \\
+Resume D & 72 \\
+Resume E & 66 \\
+Resume F & 70 \\
+\end{tabular}
+\end{center}
+\vspace{0.3cm}
+
+\textbf{Everything is between 66--74.} The scorer can't tell the difference between a great candidate and a poor one.
+\end{frame}
+
+\begin{frame}{Why Score Bunching Happens}
+\textbf{LLMs default to ``safe'' middle-range answers}:
+\begin{itemize}
+    \item Training data is full of moderate, hedging language
+    \item Without strong guidance, models avoid extremes
+    \item A vague prompt like ``score 0--100'' gives the model no anchor points
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{The model doesn't know what you mean by ``good''}:
+\begin{itemize}
+    \item Is 5 years of Python experience good or average?
+    \item Is a Master's degree required or a nice-to-have?
+    \item Should missing a skill be a small or large penalty?
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Without criteria, the model invents its own} -- and they're inconsistent.
+\end{frame}
+
+\begin{frame}{Solution: Domain Context and Grounding}
+\textbf{Grounding} = anchoring the model's output in specific facts, criteria, or source material rather than letting it generate from general patterns.
+\vspace{0.3cm}
+
+\textbf{Tell the model exactly what matters and how much}:
+\vspace{0.2cm}
+
+Instead of: ``Score this resume 0--100''
+\vspace{0.2cm}
+
+Provide:
+\begin{itemize}
+    \item \textbf{Specific criteria} with weights or importance levels
+    \item \textbf{What ``high'' and ``low'' mean} for this role
+    \item \textbf{Must-haves vs. nice-to-haves}
+    \item \textbf{Anchor points}: ``A score of 90+ means the candidate meets all requirements. Below 40 means missing critical skills.''
+\end{itemize}
+\vspace{0.3cm}
+
+\begin{center}
+\fcolorbox{blue!80}{blue!10}{%
+\begin{minipage}{0.85\textwidth}
+\centering
+\textbf{The more specific your criteria, the more differentiated the scores}
+\end{minipage}
+}
+\end{center}
+\end{frame}
+
+\section{Problem 2: Hallucinated Reasoning}
+
+\begin{frame}{Problem: The Model Makes Things Up}
+\textbf{Hallucination} = when the model generates confident, plausible-sounding content that is not supported by the input data.
+\vspace{0.3cm}
+
+\textbf{You ask the model to explain its score}:
+\vspace{0.2cm}
+
+\begin{quote}
+``The candidate has 8 years of Python experience and demonstrated strong leadership at a Fortune 500 company...''
+\end{quote}
+\vspace{0.2cm}
+
+\textbf{But the resume says}: 3 years of Python, worked at a 20-person startup.
+\vspace{0.3cm}
+
+\textbf{The model generated a plausible-sounding justification that doesn't match the actual resume.}
+\end{frame}
+
+\begin{frame}{Why Hallucination Happens}
+\textbf{LLMs are pattern completers, not fact checkers}:
+\begin{itemize}
+    \item They generate text that \textit{sounds right} based on patterns
+    \item ``Senior developer'' in training data often correlates with ``8+ years''
+    \item Without explicit instruction to reference the source, they fill gaps
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{This is especially dangerous for scoring}:
+\begin{itemize}
+    \item Score might be based on hallucinated qualifications
+    \item You can't trust the reasoning to explain the score
+    \item Impossible to audit or defend decisions
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Solution: Require Evidence (Grounding)}
+\textbf{Force the model to cite its sources}:
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item Require \textbf{exact quotes} from the resume for every claim
+    \item Ask for evidence \textit{before} the conclusion
+    \item Include an ``evidence'' field in structured output
+    \item Validate that cited text actually appears in the resume
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Result}: Instead of inventing ``8 years of Python,'' the model must point to the actual text: ``Python developer, 2021--2024''
+\vspace{0.3cm}
+
+\begin{center}
+\fcolorbox{green!80}{green!10}{%
+\begin{minipage}{0.85\textwidth}
+\centering
+\textbf{Grounding turns the LLM from a ``creative writer'' into an ``evidence-based analyst''}
+\end{minipage}
+}
+\end{center}
+\end{frame}
+
+\section{Problem 3: Inconsistency}
+
+\begin{frame}{Problem: Same Resume, Different Scores}
+\textbf{Run the same resume through the scorer three times}:
+\vspace{0.3cm}
+
+\begin{center}
+\begin{tabular}{l c}
+\textbf{Run} & \textbf{Score} \\
+\hline
+Run 1 & 78 \\
+Run 2 & 65 \\
+Run 3 & 82 \\
+\end{tabular}
+\end{center}
+\vspace{0.3cm}
+
+\textbf{A 17-point spread on the same input.}
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item Is this candidate a 65 or an 82?
+    \item Would you trust this system to rank candidates?
+    \item What if the hiring decision depends on a threshold?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why Inconsistency Happens}
+\textbf{LLMs are non-deterministic by design}:
+\begin{itemize}
+    \item Temperature controls randomness in token selection
+    \item Even at low temperature, outputs can vary
+    \item Vague instructions amplify variance -- many ``correct'' answers
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{The less constrained the task, the more variance you get}:
+\begin{itemize}
+    \item ``Score 0--100'' has enormous output space
+    \item ``Classify as: Strong Match / Partial Match / No Match'' has 3 options
+    \item More structure = less room for random drift
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Solution: Temperature and Structured Output}
+\textbf{Reduce randomness and constrain the output}:
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item \textbf{Lower temperature} (0.0--0.3) for classification and scoring tasks
+    \begin{itemize}
+        \item Less creative, more consistent
+        \item Save high temperature for brainstorming, not evaluation
+    \end{itemize}
+    \vspace{0.2cm}
+    \item \textbf{Structured output schemas} force specific fields and types
+    \begin{itemize}
+        \item JSON schema with required fields
+        \item Constrained ranges (score must be 0--100)
+        \item Enumerated categories instead of free text
+    \end{itemize}
+    \vspace{0.2cm}
+    \item \textbf{Specific criteria} reduce subjective interpretation
+    \begin{itemize}
+        \item ``Does the candidate have 5+ years Python?'' has less variance than ``Rate their Python skills''
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{Problem 4: Missing Nuance}
+
+\begin{frame}{Problem: The Scorer Ignores Important Factors}
+\textbf{A strong candidate gets a mediocre score because}:
+\begin{itemize}
+    \item The scorer focused on keyword matching
+    \item Missed that the candidate led a relevant project
+    \item Didn't weigh industry experience appropriately
+    \item Treated a PhD the same as a Bachelor's
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{A weaker candidate scores nearly as high because}:
+\begin{itemize}
+    \item Had the right keywords sprinkled throughout
+    \item Model couldn't distinguish depth from breadth
+    \item Single prompt tries to evaluate everything at once
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{One prompt asking ``score this resume'' is too much at once.}
+\end{frame}
+
+\begin{frame}{Solution: Decomposition}
+\textbf{Break the scoring into focused sub-tasks}:
+\vspace{0.2cm}
+
+\begin{center}
+\begin{tabular}{ccc}
+ & \fbox{Extract Experience} & \\
+\fbox{Resume} $\;\longrightarrow\;$ & \fbox{Extract Skills} & $\;\longrightarrow\;$ \fbox{Combine \& Score (in code)} \\
+ & \fbox{Extract Education} & \\
+\end{tabular}
+\end{center}
+\vspace{0.2cm}
+
+\textbf{Each sub-task is simpler and more focused}:
+\begin{itemize}
+    \item Easier for the model to get right
+    \item Easier for you to debug (which step went wrong?)
+    \item Can use different prompts/models for different steps
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Decomposition: Key Idea}
+\textbf{Use LLMs for what they're good at}:
+\begin{itemize}
+    \item Extracting information from unstructured text
+    \item Classification and categorization
+    \item Summarization
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Use code for what code is good at}:
+\begin{itemize}
+    \item Conditional logic (if/then rules)
+    \item Math and scoring formulas
+    \item Combining results from multiple steps
+    \item Enforcing business rules consistently
+\end{itemize}
+\vspace{0.3cm}
+
+\begin{center}
+\fcolorbox{blue!80}{blue!10}{%
+\begin{minipage}{0.85\textwidth}
+\centering
+\textbf{LLMs extract and classify. Code decides and calculates.}
+\end{minipage}
+}
+\end{center}
+\end{frame}
+
+\section{Problem 5: Edge Cases}
+
+\begin{frame}{Problem: Ambiguous Resumes Get Random Scores}
+\textbf{Some resumes are genuinely hard to evaluate}:
+\begin{itemize}
+    \item Career changer with transferable but non-obvious skills
+    \item Experience in adjacent technology (Java listed, role needs Python)
+    \item Years of experience in a broader category but not the specific area
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Without guidance, the model handles these inconsistently}:
+\begin{itemize}
+    \item Sometimes gives benefit of the doubt, sometimes doesn't
+    \item No consistent policy for ``close but not exact'' matches
+    \item Each run may interpret the ambiguity differently
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Solution: Few-Shot Examples}
+\textbf{Show the model how you want edge cases handled}:
+\vspace{0.3cm}
+
+\textbf{Include 2--5 examples in your prompt that cover}:
+\begin{enumerate}
+    \item \textbf{A clear strong match} -- what does ``high score'' look like?
+    \item \textbf{A clear weak match} -- what earns a low score?
+    \item \textbf{An ambiguous case} -- how should the model handle it?
+\end{enumerate}
+\vspace{0.3cm}
+
+\textbf{Examples are more powerful than instructions}:
+\begin{itemize}
+    \item ``Score based on relevant experience'' is vague
+    \item Showing a scored example of ``5 years Java $\rightarrow$ 60 for a Python role'' is concrete
+    \item The model learns your \textit{policy}, not just your words
+\end{itemize}
+\vspace{0.3cm}
+
+\begin{center}
+\fcolorbox{orange!80}{orange!10}{%
+\begin{minipage}{0.85\textwidth}
+\centering
+\textbf{Few-shot examples encode your judgment for edge cases}
+\end{minipage}
+}
+\end{center}
+\end{frame}
+
+\section{More Techniques}
+
+\begin{frame}{Changing Models and Role Specification}
+\textbf{Not all models are equal for every task}:
+\begin{itemize}
+    \item \textbf{Larger models} (GPT-4, Claude Opus) -- better reasoning, more expensive
+    \item \textbf{Smaller models} (Claude Haiku, GPT-4o-mini) -- faster, cheaper, good for simple tasks
+    \item Start with a capable model, then try cheaper ones and see if quality holds
+    \item Sometimes switching models fixes problems that prompt engineering can't
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Role/persona specification} -- set the model's ``mindset'':
+\begin{itemize}
+    \item ``You are a hiring manager at a tech company'' $\rightarrow$ evaluates like a practitioner
+    \item ``You are a senior engineer reviewing technical qualifications'' $\rightarrow$ focuses on depth
+    \item Activates relevant patterns from training data; one sentence is usually enough
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Chain-of-Thought and Output Validation}
+\textbf{Chain-of-thought} -- ask the model to reason before answering:
+\begin{itemize}
+    \item ``First list the relevant qualifications, then evaluate each one''
+    \item Forces organized reasoning before committing to an answer
+    \item Tradeoff: more tokens (cost and latency) for better accuracy
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Output validation and guardrails} -- don't trust, verify:
+\begin{itemize}
+    \item \textbf{Schema validation}: Use structured output (e.g., Pydantic) to enforce field types and ranges
+    \item \textbf{Range checks}: Score must be 0--100, not 150 or $-$5
+    \item \textbf{Re-prompting}: If output fails validation, try again (with a limit)
+    \item Combine AI flexibility with code reliability -- a safety net, not a replacement for good prompts
+\end{itemize}
+\end{frame}
+
+\section{Beyond Prompt Engineering}
+
+\begin{frame}{When Prompting Isn't Enough: Fine-Tuning}
+\textbf{Fine-tuning} = training a model on your specific data
+\vspace{0.3cm}
+
+\textbf{Consider fine-tuning when}:
+\begin{itemize}
+    \item You have \emph{lots} of labeled examples
+    \item Prompt engineering has plateaued and you need more consistency
+    \item You need to reduce cost (fine-tuned small models can replace large ones)
+    \item You have a very domain-specific task with specialized vocabulary
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Don't fine-tune when}:
+\begin{itemize}
+    \item You haven't tried prompt engineering thoroughly first
+    \item Your labeled data is small or noisy
+    \item Requirements change frequently (re-training is expensive)
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Rule of thumb}: Exhaust prompt engineering before fine-tuning.
+\end{frame}
+
+\section{Putting It All Together}
+
+\begin{frame}{The Improvement Toolkit}
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l l}
+\textbf{Problem} & \textbf{Solution} \\
+\hline
+Scores bunch together & Domain context, anchor points \\
+Model makes things up & Grounding with citations \\
+Results vary across runs & Temperature, structured output \\
+Misses important factors & Decomposition \\
+Edge cases handled randomly & Few-shot examples \\
+Wrong ``personality'' for task & Role/persona specification \\
+Reasoning is shallow & Chain-of-thought \\
+Bad outputs slip through & Output validation \\
+Prompt engineering plateaus & Change model or fine-tune \\
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}{Order of Operations}
+\textbf{When improving an AI system, try techniques in this order}:
+\vspace{0.3cm}
+
+\begin{enumerate}
+    \item \textbf{Get specific} -- Add domain context, criteria, and anchor points
+    \item \textbf{Add structure} -- Structured output, lower temperature
+    \item \textbf{Ground it} -- Require citations and evidence
+    \item \textbf{Show examples} -- Few-shot prompting for edge cases
+    \item \textbf{Break it apart} -- Decompose into sub-tasks
+    \item \textbf{Try a different model} -- Bigger, smaller, or specialized
+    \item \textbf{Fine-tune} -- Only after exhausting the above
+\end{enumerate}
+\vspace{0.3cm}
+
+\textbf{Each step is more effort than the last.} Start cheap and simple.
+\end{frame}
+
+\section{Your Turn}
+
+\begin{frame}{Today's Exercise}
+\textbf{Open the notebook}: \texttt{lecture\_3\_resume\_scorer\_improvement.ipynb}
+\vspace{0.3cm}
+
+\textbf{You have 6 resumes}:
+\begin{itemize}
+    \item 2 \textbf{gold} -- strong matches (should score high)
+    \item 2 \textbf{silver} -- decent matches (should score moderately)
+    \item 2 \textbf{wild} -- unknown quality (likely score lower)
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Your goal}:
+\begin{itemize}
+    \item Start with the baseline single-shot scorer
+    \item Apply the techniques from today's lecture
+    \item Improve separation: gold $>$ silver $>$ wild
+    \item Submit your scores to the leaderboard
+\end{itemize}
+\end{frame}
+
+\begin{frame}{What to Try}
+\textbf{Pick techniques and experiment}:
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item Rewrite the prompt with specific scoring criteria
+    \item Add a role/persona to the system message
+    \item Include few-shot examples of good and bad resumes
+    \item Decompose into extraction steps and combine in code
+    \item Require evidence citations for the score justification
+    \item Try different models and compare results
+    \item Adjust temperature for more consistent outputs
+\end{itemize}
+\vspace{0.3cm}
+
+\textbf{Measure your progress}: Do gold resumes reliably outscore silver? Do silver outscore wild?
+\end{frame}
+
+\begin{frame}{Let's Get Started!}
+\begin{center}
+\Large
+Open the notebook: \\[0.3cm]
+\texttt{lecture\_3\_resume\_scorer\_improvement.ipynb}
+\\[1cm]
+
+Apply the techniques \\[0.3cm]
+Improve gold vs. silver vs. wild separation \\[0.3cm]
+Submit to the leaderboard
+\end{center}
+\end{frame}
+
+\end{document}

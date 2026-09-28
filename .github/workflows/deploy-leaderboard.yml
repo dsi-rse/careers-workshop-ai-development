@@ -1,0 +1,26 @@
+name: Deploy Leaderboard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'leaderboard/**'
+      - '.github/workflows/deploy-leaderboard.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 3.134.128.141
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/2026-spring-AI-Development
+            git pull origin main
+            make -C leaderboard docker-down
+            make -C leaderboard docker-up
+            sleep 2
+            curl -sf http://localhost/lecture2/api/health > /dev/null && curl -sf http://localhost/lecture3/api/health > /dev/null && echo "Leaderboard is running" || echo "WARNING: Leaderboard failed to start"

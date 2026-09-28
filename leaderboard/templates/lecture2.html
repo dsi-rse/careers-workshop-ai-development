@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Scoring Leaderboard – Lecture 2</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #1a1a2e;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .controls button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .controls button:hover { background: #c0392b; }
+        .controls a {
+            margin-left: 1rem;
+            color: #2980b9;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .controls a:hover { text-decoration: underline; }
+        .table-wrapper {
+            max-width: 100%;
+            overflow-x: auto;
+            margin: 0 auto;
+        }
+        table {
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 100%;
+        }
+        th, td {
+            padding: 0.6rem 0.8rem;
+            text-align: center;
+            white-space: nowrap;
+        }
+        th {
+            background: #1a1a2e;
+            color: white;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        th:hover { background: #16213e; }
+        th.resume-header {
+            background: #1a1a2e;
+            text-align: left;
+            position: sticky;
+            left: 0;
+            z-index: 2;
+        }
+        td.resume-id {
+            background: #1a1a2e;
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            user-select: none;
+        }
+        td.resume-id:hover { background: #16213e; }
+        tr:nth-child(even) td:not(.resume-id) { background: #f8f9fa; }
+        tr:hover td:not(.resume-id) { background: #e8f0fe; }
+        td { border-bottom: 1px solid #eee; border-right: 1px solid #eee; }
+        .score { font-size: 1.1rem; font-weight: 600; color: #1a1a2e; }
+        .timestamp { font-size: 0.7rem; color: #999; margin-top: 2px; }
+        .empty-cell { color: #ccc; font-style: italic; font-size: 0.85rem; }
+        .empty-msg {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+            font-style: italic;
+        }
+        .refresh-note {
+            text-align: center;
+            margin-top: 1rem;
+            color: #888;
+            font-size: 0.85rem;
+        }
+        /* Gear dropdown */
+        .header-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .gear-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-size: 0.75rem;
+            padding: 0;
+            line-height: 1;
+        }
+        .gear-btn:hover { color: #fff; }
+        .dropdown-anchor {
+            display: inline-block;
+        }
+        /* Shared dropdown rendered at body level */
+        #sharedDropdown {
+            display: none;
+            position: fixed;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            min-width: 140px;
+        }
+        #sharedDropdown.show { display: block; }
+        #sharedDropdown button {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.8rem;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.82rem;
+            color: #333;
+        }
+        #sharedDropdown button:hover { background: #f0f0f0; }
+        #sharedDropdown button.danger { color: #e74c3c; }
+        #sharedDropdown button.danger:hover { background: #fdecea; }
+    </style>
+</head>
+<body>
+    <h1>Resume Scoring Leaderboard &mdash; Lecture 2</h1>
+    <div class="controls">
+        <button onclick="resetLeaderboard()">Reset Leaderboard</button>
+        <a href="/">&larr; Home</a>
+    </div>
+
+    {% if team_names %}
+    <div class="table-wrapper">
+        <table id="leaderboard">
+            <thead>
+                <tr>
+                    <th class="resume-header">Resume ID</th>
+                    {% for team in team_names %}
+                    <th>
+                        <div class="header-wrapper">
+                            <span>{{ team }}</span>
+                            <div class="dropdown-anchor">
+                                <button class="gear-btn" onclick="openGear(event, 'team', '{{ team }}', {{ loop.index }})">&#9881;</button>
+                            </div>
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for rid in resume_ids %}
+                <tr>
+                    <td class="resume-id">
+                        <div class="header-wrapper">
+                            <span>{{ rid }}</span>
+                            <div class="dropdown-anchor">
+                                <button class="gear-btn" onclick="openGear(event, 'resume', '{{ rid }}', {{ loop.index - 1 }})">&#9881;</button>
+                            </div>
+                        </div>
+                    </td>
+                    {% for team in team_names %}
+                    <td>
+                        {% set key = (rid, team) %}
+                        {% if key in grid %}
+                        <div class="score">{{ grid[key].score }}</div>
+                        <div class="timestamp">{{ grid[key].submitted_at }}</div>
+                        {% else %}
+                        <span class="empty-cell">-</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-msg">No submissions yet.</p>
+    {% endif %}
+
+    <p class="refresh-note">Auto-refreshes every 10 seconds</p>
+
+    <!-- Shared dropdown (rendered outside table to avoid stacking context issues) -->
+    <div id="sharedDropdown"></div>
+
+    <script>
+        setTimeout(() => location.reload(), 10000);
+
+        const API_KEY = "{{ api_key }}";
+        const LECTURE = "lecture2";
+
+        /* ---- Shared dropdown ---- */
+        function openGear(event, type, id, index) {
+            event.stopPropagation();
+            const dd = document.getElementById('sharedDropdown');
+            const wasOpen = dd.classList.contains('show');
+            dd.classList.remove('show');
+            if (wasOpen) return;
+
+            let html = '';
+            if (type === 'team') {
+                html += '<button onclick="sortByColumn(' + index + ', \'asc\')">Sort Ascending</button>';
+                html += '<button onclick="sortByColumn(' + index + ', \'desc\')">Sort Descending</button>';
+                html += '<button class="danger" onclick="deleteTeam(\'' + id + '\')">Delete Column</button>';
+            } else {
+                html += '<button onclick="sortByRow(' + index + ', \'asc\')">Sort Ascending</button>';
+                html += '<button onclick="sortByRow(' + index + ', \'desc\')">Sort Descending</button>';
+                html += '<button class="danger" onclick="deleteResume(\'' + id + '\')">Delete Row</button>';
+            }
+            dd.innerHTML = html;
+
+            const rect = event.currentTarget.getBoundingClientRect();
+            dd.style.top = (rect.bottom + 4) + 'px';
+            dd.style.left = Math.min(rect.left, window.innerWidth - 160) + 'px';
+            dd.classList.add('show');
+        }
+
+        document.addEventListener('click', () => {
+            document.getElementById('sharedDropdown').classList.remove('show');
+        });
+
+        /* ---- Sorting ---- */
+        function getScore(cell) {
+            const scoreEl = cell.querySelector('.score');
+            return scoreEl ? parseFloat(scoreEl.textContent) : -1;
+        }
+
+        function sortByColumn(colIndex, direction) {
+            const tbody = document.querySelector('#leaderboard tbody');
+            const rows = Array.from(tbody.rows);
+            const asc = direction === 'asc';
+            rows.sort((a, b) => {
+                const aVal = getScore(a.cells[colIndex]);
+                const bVal = getScore(b.cells[colIndex]);
+                return asc ? aVal - bVal : bVal - aVal;
+            });
+            rows.forEach(r => tbody.appendChild(r));
+            closeDropdowns();
+        }
+
+        function sortByRow(rowIndex, direction) {
+            const table = document.getElementById('leaderboard');
+            const thead = table.tHead.rows[0];
+            const tr = table.tBodies[0].rows[rowIndex];
+            const asc = direction === 'asc';
+
+            const cols = [];
+            for (let i = 1; i < tr.cells.length; i++) {
+                cols.push({ index: i, score: getScore(tr.cells[i]) });
+            }
+            cols.sort((a, b) => asc ? a.score - b.score : b.score - a.score);
+
+            const order = cols.map(c => c.index);
+
+            const headerCells = Array.from(thead.cells);
+            const newHeader = [headerCells[0]];
+            order.forEach(i => newHeader.push(headerCells[i]));
+            newHeader.forEach(c => thead.appendChild(c));
+
+            const tbody = table.tBodies[0];
+            Array.from(tbody.rows).forEach(row => {
+                const cells = Array.from(row.cells);
+                const newRow = [cells[0]];
+                order.forEach(i => newRow.push(cells[i]));
+                newRow.forEach(c => row.appendChild(c));
+            });
+            closeDropdowns();
+        }
+
+        /* ---- Deleting ---- */
+        function deleteTeam(teamName) {
+            if (!confirm('Delete all submissions for team "' + teamName + '"?')) return;
+            fetch("/" + LECTURE + "/api/delete_team", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-API-Key": API_KEY },
+                body: JSON.stringify({ team_name: teamName })
+            })
+            .then(resp => { if (!resp.ok) throw new Error("Delete failed"); location.reload(); })
+            .catch(err => alert(err.message));
+        }
+
+        function deleteResume(resumeId) {
+            if (!confirm('Delete all submissions for resume "' + resumeId + '"?')) return;
+            fetch("/" + LECTURE + "/api/delete_resume", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-API-Key": API_KEY },
+                body: JSON.stringify({ resume_id: resumeId })
+            })
+            .then(resp => { if (!resp.ok) throw new Error("Delete failed"); location.reload(); })
+            .catch(err => alert(err.message));
+        }
+
+        /* ---- Reset ---- */
+        function resetLeaderboard() {
+            const password = prompt("Enter password to reset the leaderboard:");
+            if (!password) return;
+
+            if (password !== "password") {
+                alert("Incorrect password");
+                return;
+            }
+
+            fetch("/" + LECTURE + "/api/reset", {
+                method: "POST",
+                headers: { "X-API-Key": API_KEY }
+            })
+            .then(resp => {
+                if (!resp.ok) throw new Error("Reset failed");
+                location.reload();
+            })
+            .catch(err => alert(err.message));
+        }
+
+        function closeDropdowns() {
+            document.getElementById('sharedDropdown').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
