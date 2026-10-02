@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 import httpx
 import json
 import csv
+import textwrap
 
 
 def load_resumes(csv_path: str) -> Dict[str, Dict[str, str]]:
@@ -222,27 +223,38 @@ def safe_chat(
     return result  # Return last failed result
 
 
+def format_response(text: str, width: int = 88, indent: str = "    ") -> str:
+    """Wrap and indent a model response for notebook output, preserving its line breaks."""
+    out = []
+    for line in text.strip().splitlines():
+        if not line.strip():
+            out.append("")
+            continue
+        lead = indent + " " * (len(line) - len(line.lstrip()))
+        out.append(textwrap.fill(line.strip(), width=width, initial_indent=lead, subsequent_indent=lead))
+    return "\n".join(out)
+
+
 def display_comparison(results_df, prompt_name: str) -> None:
     """Display responses from all models for a given prompt."""
     import pandas as pd
-    
+
     subset = results_df[results_df["prompt"] == prompt_name]
-    
-    print(f"\n{'='*70}")
-    print(f"Prompt: {prompt_name}")
-    print(f"{'='*70}\n")
-    
+
+    print(f"\n{'═'*70}")
+    print(f"  Prompt: {prompt_name}")
+    print(f"{'═'*70}\n")
+
     for _, row in subset.iterrows():
-        print(f"[{row['model_key'].upper()}] ({row['model_id']})")
-        print("-" * 70)
-        
-        if row["error"]:
-            print(f"❌ Error: {row['error']}\n")
+        label = f"── {row['model_key'].upper()} ({row['model_id']}) "
+        print(label + "─" * max(0, 70 - len(label)) + "\n")
+
+        if not pd.isnull(row["error"]):
+            print(f"    ❌ Error: {row['error']}")
         else:
-            print(row["content"])
-            print()
+            print(format_response(row["content"]))
             usage = row["usage"]
             if isinstance(usage, dict) and usage:
-                print(f"Tokens: {usage.get('total_tokens', 'N/A')} total\n")
-        
+                print(f"\n    Tokens: {usage.get('prompt_tokens', 0)} prompt + {usage.get('completion_tokens', 0)} completion")
+
         print()
