@@ -101,6 +101,11 @@ Run the commands one at a time. You only need to clone the repo once. For later 
 
 ### 3. Open the notebook and add your API key
 
-In Jupyter, open the `notebooks/` folder and then the lecture's notebook. Paste your OpenRouter API key into the first code cell. For Lectures 2–4, also fill in your team name.
+In Jupyter, open the `notebooks/` folder and then the lecture's notebook. To get your API key:
+1. Go to https://bw.cs.uchicago.edu/#/send/Tw0wRlZRSDSvmQVip7Se9Q/mVAru7ax6qyPEeByXTtEpw.
+2. Enter the password provide by your course instructors during the class session.
+3. Copy the provided value and paste it into OPENROUTER_API_KEY in the first code cell in your notebook.
+
+For Lectures 2–4, also fill in your team name.
 
 To stop Jupyter, press Ctrl+C in the terminal. Press it again if Jupyter asks you to confirm.
