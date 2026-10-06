@@ -903,7 +903,7 @@ wheels = [
 ]
 
 [[package]]
-name = "lecture-2"
+name = "lecture-1"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
