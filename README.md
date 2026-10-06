@@ -53,12 +53,54 @@ This repository contains materials for a four-part workshop on AI development fo
 - Build an agentic email outreach system — the agent scores resumes, decides outcomes, and drafts personalized emails
 - Production considerations: failure modes, safety guardrails, ethical implications, and human-in-the-loop design
 
-## Running notebooks (per lecture) 
+## Getting set up for the exercises
 
-Each lecture directory contains a `Makefile`, `Dockerfile`, and `pyproject.toml`.
+The exercise notebooks run in Jupyter inside a Docker container, so you don't need Python installed on your computer.
 
-From a lecture directory (e.g. `lecture_2/`):
-- `make build`
-- `make notebook` (starts Jupyter in Docker on port 8888)
-- `make interactive` (drops you into a bash shell in the container)
+### 1. Install dependencies
 
+- **Docker Desktop:** [Download and install it](https://www.docker.com/products/docker-desktop/), then open it. Docker Desktop needs to be running whenever you work on the notebooks. On Windows, the installer sets up WSL 2 and may ask you to restart.
+- **Git:**
+  - **Mac:** Run `git --version` in Terminal. If Git isn't installed, macOS will offer to install the Command Line Tools, which include it.
+  - **Windows:** Install [Git for Windows](https://git-scm.com/download/win), or run `winget install --id Git.Git -e` in PowerShell. Close and reopen PowerShell afterward.
+  - **Linux or WSL:** Git is usually already installed. If not, run `sudo apt install git`.
+
+### 2. Clone the repo and open it in Jupyter
+
+Open a terminal: **Terminal** on Mac or Linux, or **PowerShell** on Windows. 
+
+(Note for WSL users: If you use WSL, you can use your WSL terminal instead, but clone the repo inside your Linux home folder, not under `/mnt/c/`. The commands below are the same in all of them.)
+
+Run the commands one at a time. You only need to clone the repo once. For later lectures, start at the `cd` command. The first run for each lecture takes a few minutes while Docker downloads what it needs.
+
+1. Download the repo:
+
+   ```
+   git clone https://github.com/dsi-rse/careers-workshop-ai-development.git
+   ```
+
+2. Go to the sub-directory for this lecture, replacing `{lecture number}` with 1, 2, 3, or 4 (for example, `lecture_2`):
+
+   ```
+   cd careers-workshop-ai-development/lecture_{lecture number}
+   ```
+
+3. Build the Docker image for this lecture:
+
+   ```
+   docker build . -t ai-workshop
+   ```
+
+4. Start Jupyter in a container:
+
+   ```
+   docker run --rm -it -p 8888:8888 -v "${PWD}:/app/src" -w /app/src ai-workshop uv run jupyter notebook --allow-root --no-browser --port 8888 --ip=0.0.0.0
+   ```
+
+5. Open Jupyter in your browser: the terminal prints two links. Ctrl-click (Cmd-click on a Mac) the one that starts with `http://127.0.0.1:8888/tree?token=`, or copy it into your browser. The other link won't work.
+
+### 3. Open the notebook and add your API key
+
+In Jupyter, open the `notebooks/` folder and then the lecture's notebook. Paste your OpenRouter API key into the first code cell. For Lectures 2–4, also fill in your team name.
+
+To stop Jupyter, press Ctrl+C in the terminal. Press it again if Jupyter asks you to confirm.
