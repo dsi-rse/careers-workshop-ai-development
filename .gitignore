@@ -240,3 +240,5 @@ __marimo__/
 # Beads / Dolt files (added by bd init)
 .dolt/
 .beads-credential-key
+.beads.gate.lock
+.beads/.auto-import-issues.jsonl

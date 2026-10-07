@@ -143,18 +143,18 @@ Lecture 3 is new and can diverge.
 
 **URL layout:**
 
-- `ai-leaderboard.site/lecture2`              — Lecture 2 HTML view (current behavior)
-- `ai-leaderboard.site/lecture2/api/submit`   — submit a score
-- `ai-leaderboard.site/lecture2/api/submissions`
-- `ai-leaderboard.site/lecture2/api/delete_team`
-- `ai-leaderboard.site/lecture2/api/reset`
+- `52.21.64.122/lecture2`              — Lecture 2 HTML view (current behavior)
+- `52.21.64.122/lecture2/api/submit`   — submit a score
+- `52.21.64.122/lecture2/api/submissions`
+- `52.21.64.122/lecture2/api/delete_team`
+- `52.21.64.122/lecture2/api/reset`
 
-- `ai-leaderboard.site/lecture3`              — Lecture 3 HTML view (new)
-- `ai-leaderboard.site/lecture3/api/submit`
-- `ai-leaderboard.site/lecture3/api/submissions`
-- `ai-leaderboard.site/lecture3/api/metrics`  — NEW: per-team ordinal metrics
-- `ai-leaderboard.site/lecture3/api/delete_team`
-- `ai-leaderboard.site/lecture3/api/reset`
+- `52.21.64.122/lecture3`              — Lecture 3 HTML view (new)
+- `52.21.64.122/lecture3/api/submit`
+- `52.21.64.122/lecture3/api/submissions`
+- `52.21.64.122/lecture3/api/metrics`  — NEW: per-team ordinal metrics
+- `52.21.64.122/lecture3/api/delete_team`
+- `52.21.64.122/lecture3/api/reset`
 
 Implementation option: one FastAPI `APIRouter` per lecture, mounted under
 `/lecture2` and `/lecture3`. Each router has its own `VALID_RESUME_IDS` set
@@ -185,8 +185,8 @@ argument (already the case).
 ### Backward compatibility
 
 - Lecture 2 notebook continues to work. Its `submit_score` helper in
-  `resume_utils.py` currently targets `http://ai-leaderboard.site/api/submit`
-  — update it to `http://ai-leaderboard.site/lecture2/api/submit`. Students
+  `resume_utils.py` currently targets `http://52.21.64.122/api/submit`
+  — update it to `http://52.21.64.122/lecture2/api/submit`. Students
   re-running Lecture 2 code will just need a fresh pull.
 - Add a `/` root route that redirects to `/lecture3` (or a lecture picker
   page).

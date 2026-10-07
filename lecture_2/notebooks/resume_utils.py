@@ -8,7 +8,7 @@ import time
 
 from pydantic import BaseModel
 
-LEADERBOARD_BASE_URL = "http://ai-leaderboard.site"
+LEADERBOARD_BASE_URL = "http://52.21.64.122"
 
 
 def load_resumes(csv_path: str) -> Dict[str, Dict[str, str]]:

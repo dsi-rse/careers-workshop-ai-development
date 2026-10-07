@@ -3,7 +3,7 @@
 import random
 import httpx
 
-BASE_URL = "http://ai-leaderboard.site"
+BASE_URL = "http://52.21.64.122"
 API_KEY = "leaderboard-api-key"
 
 TEAMS = [
