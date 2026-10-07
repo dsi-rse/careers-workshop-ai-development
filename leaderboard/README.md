@@ -10,14 +10,11 @@ Students build their first LLM-powered resume scoring system. Teams submit numer
 ### Lecture 3 — Context Engineering (Gold/Silver Discrimination)
 Building on Lecture 2, students must now discriminate between "gold" (strong-fit) and "silver" (weak-fit) resumes. The leaderboard color-codes resume IDs by tier and computes per-team metrics: gold/silver mean gap, rank separation, and cost. This assignment teaches context engineering — crafting prompts and few-shot examples that produce meaningfully different outputs for different input categories.
 
-### Lecture 4 — Agentic Systems (Outreach Emails)
-Students build an agentic pipeline that reads a resume, decides an outcome (INTERVIEW / REJECT / REVIEW), and drafts a personalized outreach email. The leaderboard shows outcome badges instead of numeric scores, and each cell is clickable to view the generated email. A slideshow overlay lets instructors review all emails for a given resume across teams. This assignment covers tool use, multi-step reasoning, and structured output in agentic LLM systems.
-
 ## Screenshots
 
-| Home | Lecture 2 | Lecture 3 | Lecture 4 |
-|------|-----------|-----------|-----------|
-| ![Home](./screenshots/home.png) | ![L2](./screenshots/lecture2.png) | ![L3](./screenshots/lecture3.png) | ![L4](./screenshots/lecture4.png) |
+| Home | Lecture 2 | Lecture 3 |
+|------|-----------|-----------|
+| ![Home](./screenshots/home.png) | ![L2](./screenshots/lecture2.png) | ![L3](./screenshots/lecture3.png) |
 
 ## Running
 
