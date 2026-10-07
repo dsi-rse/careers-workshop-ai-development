@@ -213,7 +213,7 @@ def main():
     print()
 
     # --- Submit to leaderboard ---
-    LEADERBOARD_URL = "http://ai-leaderboard.site/lecture3"
+    LEADERBOARD_URL = "http://52.21.64.122/lecture3"
     LEADERBOARD_KEY = "leaderboard-api-key"
 
     for strategy_name, scores in [("one-shot", one_shot_scores), ("multi-step", multi_scores)]:

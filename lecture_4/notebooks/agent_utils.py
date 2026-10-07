@@ -12,7 +12,7 @@ import json
 from pydantic import BaseModel
 
 
-LEADERBOARD_BASE_URL = "http://ai-leaderboard.site"
+LEADERBOARD_BASE_URL = "http://52.21.64.122"
 
 # ---------------------------------------------------------------------------
 # Scoring prompt from Lecture 3 (template — fill {job_req} at runtime)
