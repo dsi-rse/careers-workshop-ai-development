@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 960 420"
+   width="960"
+   height="420"
+   font-family="Helvetica, Arial, sans-serif"
+   version="1.1"
+   id="svg30"
+   sodipodi:docname="augment_flow.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview30"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.996875"
+     inkscape:cx="187.54304"
+     inkscape:cy="318.74804"
+     inkscape:current-layer="svg30" />
+  <defs
+     id="defs1">
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="8"
+       markerHeight="8"
+       orient="auto-start-reverse">
+      <path
+         d="M0,0 L10,5 L0,10 z"
+         fill="#555"
+         id="path1" />
+    </marker>
+  </defs>
+  <rect
+     width="960"
+     height="420"
+     fill="#ffffff"
+     id="rect1" />
+  <!-- Agent -->
+  <rect
+     x="20"
+     y="150"
+     width="190"
+     height="110"
+     rx="8"
+     fill="#f3e8fb"
+     stroke="#7b3fa0"
+     stroke-width="1.5"
+     id="rect2" />
+  <text
+     x="115"
+     y="178"
+     text-anchor="middle"
+     font-size="15"
+     font-weight="bold"
+     fill="#1a1a2e"
+     id="text2">Agent</text>
+  <text
+     x="115"
+     y="198"
+     text-anchor="middle"
+     font-size="12"
+     fill="#333"
+     id="text3">(AGENT_MODEL)</text>
+  <text
+     x="115"
+     y="222"
+     text-anchor="middle"
+     font-size="12"
+     fill="#333"
+     id="text4">writes the prompt for</text>
+  <text
+     x="115"
+     y="240"
+     text-anchor="middle"
+     font-size="12"
+     fill="#333"
+     id="text5">the column it wants</text>
+  <!-- tool call -->
+  <rect
+     x="250"
+     y="40"
+     width="250"
+     height="88"
+     rx="6"
+     fill="#ffffff"
+     stroke="#7b3fa0"
+     id="rect5" />
+  <text
+     x="262"
+     y="62"
+     font-size="12"
+     font-weight="bold"
+     fill="#7b3fa0"
+     id="text6">assistant: tool call</text>
+  <text
+     x="262"
+     y="82"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text7">column: &quot;highest_degree&quot;</text>
+  <text
+     x="262"
+     y="100"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text8">prompt: &quot;What is the ...&quot;</text>
+  <text
+     x="262"
+     y="118"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text9">type:   &quot;string&quot;</text>
+  <path
+     d="M115,150 L115,84 L246,84"
+     fill="none"
+     stroke="#555"
+     stroke-width="1.5"
+     marker-end="url(#arrow)"
+     id="path9" />
+  <!-- fan out -->
+  <rect
+     x="560"
+     y="20"
+     width="230"
+     height="44"
+     rx="6"
+     fill="#eef3fb"
+     stroke="#4a6fa5"
+     id="rect9" />
+  <text
+     x="675"
+     y="38"
+     text-anchor="middle"
+     font-size="12"
+     fill="#333"
+     id="text10">FAST_MODEL(prompt + resume 1)</text>
+  <text
+     x="675"
+     y="55"
+     text-anchor="middle"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text11">{&quot;value&quot;: &quot;BS in CS&quot;}</text>
+  <rect
+     x="560"
+     y="74"
+     width="230"
+     height="44"
+     rx="6"
+     fill="#eef3fb"
+     stroke="#4a6fa5"
+     id="rect11" />
+  <text
+     x="675"
+     y="92"
+     text-anchor="middle"
+     font-size="12"
+     fill="#333"
+     id="text12">FAST_MODEL(prompt + resume 2)</text>
+  <text
+     x="675"
+     y="109"
+     text-anchor="middle"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text13">{&quot;value&quot;: null}</text>
+  <text
+     x="675"
+     y="140"
+     text-anchor="middle"
+     font-size="16"
+     fill="#4a6fa5"
+     id="text14">⋮</text>
+  <text
+     x="800"
+     y="140"
+     font-size="11"
+     fill="#777"
+     id="text15">134 calls,</text>
+  <text
+     x="800"
+     y="154"
+     font-size="11"
+     fill="#777"
+     id="text16">in parallel</text>
+  <rect
+     x="560"
+     y="160"
+     width="230"
+     height="44"
+     rx="6"
+     fill="#eef3fb"
+     stroke="#4a6fa5"
+     id="rect16" />
+  <text
+     x="675"
+     y="178"
+     text-anchor="middle"
+     font-size="12"
+     fill="#333"
+     id="text17">FAST_MODEL(prompt + resume 134)</text>
+  <text
+     x="675"
+     y="195"
+     text-anchor="middle"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text18">{&quot;value&quot;: &quot;MS in IT&quot;}</text>
+  <line
+     x1="500"
+     y1="84"
+     x2="556"
+     y2="42"
+     stroke="#555"
+     stroke-width="1.2"
+     marker-end="url(#arrow)"
+     id="line18" />
+  <line
+     x1="500"
+     y1="84"
+     x2="556"
+     y2="96"
+     stroke="#555"
+     stroke-width="1.2"
+     marker-end="url(#arrow)"
+     id="line19" />
+  <line
+     x1="500"
+     y1="84"
+     x2="556"
+     y2="180"
+     stroke="#555"
+     stroke-width="1.2"
+     marker-end="url(#arrow)"
+     id="line20" />
+  <!-- collect -->
+  <rect
+     x="560"
+     y="250"
+     width="230"
+     height="62"
+     rx="8"
+     fill="#fdf6e3"
+     stroke="#b58900"
+     stroke-width="1.5"
+     id="rect20" />
+  <text
+     x="675"
+     y="274"
+     text-anchor="middle"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text20">db[&quot;highest_degree&quot;] =</text>
+  <text
+     x="675"
+     y="294"
+     text-anchor="middle"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text21">  values cast to type</text>
+  <line
+     x1="675"
+     y1="204"
+     x2="675"
+     y2="246"
+     stroke="#555"
+     stroke-width="1.5"
+     marker-end="url(#arrow)"
+     id="line21" />
+  <text
+     x="820"
+     y="280"
+     font-size="12"
+     fill="#b58900"
+     id="text22">the database</text>
+  <text
+     x="820"
+     y="296"
+     font-size="12"
+     fill="#b58900"
+     id="text23">is changed!</text>
+  <!-- result back -->
+  <rect
+     x="250"
+     y="300"
+     width="250"
+     height="88"
+     rx="6"
+     fill="#fff4e5"
+     stroke="#d9822b"
+     id="rect23" />
+  <text
+     x="262"
+     y="322"
+     font-size="12"
+     font-weight="bold"
+     fill="#d9822b"
+     id="text24">user: TOOL RESULT</text>
+  <text
+     x="262"
+     y="342"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text25">{&quot;10089434&quot;: &quot;BS in CS&quot;,</text>
+  <text
+     x="262"
+     y="360"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text26"> &quot;10247517&quot;: null,</text>
+  <text
+     x="262"
+     y="378"
+     font-size="12"
+     font-family="Menlo, Consolas, monospace"
+     fill="#333"
+     id="text27"> ...}</text>
+  <path
+     d="M675,312 L675,344 L504,344"
+     fill="none"
+     stroke="#555"
+     stroke-width="1.5"
+     marker-end="url(#arrow)"
+     id="path27" />
+  <path
+     d="M250,344 L115,344 L115,264"
+     fill="none"
+     stroke="#555"
+     stroke-width="1.5"
+     marker-end="url(#arrow)"
+     id="path28" />
+  <text
+     x="20"
+     y="370"
+     font-size="12px"
+     fill="#555555"
+     id="text28">Next iteration, the agent</text>
+  <text
+     x="20"
+     y="386"
+     font-size="12px"
+     fill="#555555"
+     id="text29">sees the new column and</text>
+  <text
+     x="20"
+     y="402"
+     font-size="12px"
+     fill="#555555"
+     id="text30">decides: respond, or augment again?</text>
+</svg>
