@@ -29,7 +29,7 @@ def main():
 
     # Reset and seed all leaderboards
     with httpx.Client(base_url=BASE, timeout=30) as client:
-        for lecture in ["lecture2", "lecture3", "lecture4"]:
+        for lecture in ["lecture2", "lecture3"]:
             r = client.post(f"/{lecture}/api/reset", headers=headers)
             print(f"  Reset {lecture}: {r.status_code}")
             r = client.post(f"/{lecture}/api/seed", headers=headers)
@@ -44,7 +44,6 @@ def main():
             ("/", "home"),
             ("/lecture2", "lecture2"),
             ("/lecture3", "lecture3"),
-            ("/lecture4", "lecture4"),
         ]
 
         for path, name in pages:
