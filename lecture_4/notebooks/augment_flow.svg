@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" width="960" height="420" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#555"/>
+    </marker>
+  </defs>
+  <rect width="960" height="420" fill="#ffffff"/>
+
+  <!-- Agent -->
+  <rect x="20" y="150" width="190" height="110" rx="8" fill="#f3e8fb" stroke="#7b3fa0" stroke-width="1.5"/>
+  <text x="115" y="178" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a1a2e">Agent</text>
+  <text x="115" y="198" text-anchor="middle" font-size="12" fill="#333">(AGENT_MODEL)</text>
+  <text x="115" y="222" text-anchor="middle" font-size="12" fill="#333">writes the prompt for</text>
+  <text x="115" y="240" text-anchor="middle" font-size="12" fill="#333">the column it wants</text>
+
+  <!-- tool call -->
+  <rect x="250" y="40" width="250" height="88" rx="6" fill="#ffffff" stroke="#7b3fa0"/>
+  <text x="262" y="62" font-size="12" font-weight="bold" fill="#7b3fa0">assistant: tool call</text>
+  <text x="262" y="82" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333">column: "highest_degree"</text>
+  <text x="262" y="100" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333">prompt: "What is the ..."</text>
+  <text x="262" y="118" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333">type:   "string"</text>
+  <path d="M115,150 L115,84 L246,84" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- fan out -->
+  <rect x="560" y="20" width="230" height="44" rx="6" fill="#eef3fb" stroke="#4a6fa5"/>
+  <text x="675" y="38" text-anchor="middle" font-size="12" fill="#333">FAST_MODEL(prompt + resume 1)</text>
+  <text x="675" y="55" text-anchor="middle" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333">{"value": "BS in CS"}</text>
+
+  <rect x="560" y="74" width="230" height="44" rx="6" fill="#eef3fb" stroke="#4a6fa5"/>
+  <text x="675" y="92" text-anchor="middle" font-size="12" fill="#333">FAST_MODEL(prompt + resume 2)</text>
+  <text x="675" y="109" text-anchor="middle" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333">{"value": null}</text>
+
+  <text x="675" y="140" text-anchor="middle" font-size="16" fill="#4a6fa5">⋮</text>
+  <text x="800" y="140" font-size="11" fill="#777">134 calls,</text>
+  <text x="800" y="154" font-size="11" fill="#777">in parallel</text>
+
+  <rect x="560" y="160" width="230" height="44" rx="6" fill="#eef3fb" stroke="#4a6fa5"/>
+  <text x="675" y="178" text-anchor="middle" font-size="12" fill="#333">FAST_MODEL(prompt + resume 134)</text>
+  <text x="675" y="195" text-anchor="middle" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333">{"value": "MS in IT"}</text>
+
+  <line x1="500" y1="84" x2="556" y2="42" stroke="#555" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="500" y1="84" x2="556" y2="96" stroke="#555" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="500" y1="84" x2="556" y2="180" stroke="#555" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- collect -->
+  <rect x="560" y="250" width="230" height="62" rx="8" fill="#fdf6e3" stroke="#b58900" stroke-width="1.5"/>
+  <text x="675" y="274" text-anchor="middle" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333">db["highest_degree"] =</text>
+  <text x="675" y="294" text-anchor="middle" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333">  values cast to type</text>
+  <line x1="675" y1="204" x2="675" y2="246" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="820" y="280" font-size="12" fill="#b58900">the database</text>
+  <text x="820" y="296" font-size="12" fill="#b58900">is changed!</text>
+
+  <!-- result back -->
+  <rect x="250" y="300" width="250" height="88" rx="6" fill="#fff4e5" stroke="#d9822b"/>
+  <text x="262" y="322" font-size="12" font-weight="bold" fill="#d9822b">user: TOOL RESULT</text>
+  <text x="262" y="342" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333">{"10089434": "BS in CS",</text>
+  <text x="262" y="360" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333"> "10247517": null,</text>
+  <text x="262" y="378" font-size="12" font-family="Menlo, Consolas, monospace" fill="#333"> ...}</text>
+  <path d="M675,312 L675,344 L504,344" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M250,344 L115,344 L115,264" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <text x="20" y="300" font-size="12" fill="#555">Next iteration, the agent</text>
+  <text x="20" y="316" font-size="12" fill="#555">sees the new column and</text>
+  <text x="20" y="332" font-size="12" fill="#555">decides: respond, or augment again?</text>
+</svg>
