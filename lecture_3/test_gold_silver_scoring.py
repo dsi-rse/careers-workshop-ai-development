@@ -23,7 +23,7 @@ from typing import List
 # ---------------------------------------------------------------------------
 
 API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-MODEL = "anthropic/claude-sonnet-4-6"
+MODEL = "anthropic/claude-sonnet-5.5"
 CSV_PATH = "lecture_3/data/resumes_final_with_gold_silver.csv"
 JOB_REQ_PATH = "lecture_3/data/job_req_senior.md"
 
