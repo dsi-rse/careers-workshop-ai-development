@@ -36,7 +36,7 @@ def analyze_resume(
     prompt: str,
     resume_text: str,
     output_schema: Type[BaseModel],
-    model: str = "anthropic/claude-sonnet-4-6",
+    model: str = "anthropic/claude-sonnet-5.5",
     temperature: float = 0.3
 ) -> Dict[str, Any]:
     """

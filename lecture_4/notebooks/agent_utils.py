@@ -123,7 +123,7 @@ def structured_llm_call(
     prompt: str,
     context_data: Dict[str, Any],
     output_schema: Type[BaseModel],
-    model: str = "anthropic/claude-sonnet-4-6",
+    model: str = "anthropic/claude-sonnet-5.5",
     temperature: float = 0.2,
 ) -> Dict[str, Any]:
     """Make a structured LLM call via OpenRouter with Pydantic strict json_schema.
@@ -238,7 +238,7 @@ def run_agent(
     api_key: str,
     candidate_id: str,
     tool_registry: dict,
-    model: str = "anthropic/claude-sonnet-4-6",
+    model: str = "anthropic/claude-sonnet-5.5",
     temperature: float = 0.3,
     max_turns: int = 6,
     verbose: bool = True,
